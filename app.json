@@ -1,0 +1,12 @@
+{
+  "name": "Afrodita",
+  "displayName": "Afrodita",
+  "expo": {
+    "name": "Afrodita",
+    "slug": "Afrodita",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
