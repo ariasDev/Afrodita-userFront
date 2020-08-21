@@ -7,9 +7,7 @@ import {
     TextInput,
     TouchableOpacity,
     ScrollView,
-    Alert,
-    Modal,
-    ActivityIndicator
+    Alert
 } from 'react-native'
 import ModalLoadComponent from '../modalLoad/ModalLoadComponent'
 const BACKEND_SERVER = require('../../enviroment').BACKEND_SERVER

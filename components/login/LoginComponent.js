@@ -4,13 +4,9 @@ import {
     StyleSheet, 
     Text, 
     TextInput, 
-    Button, 
     TouchableOpacity, 
     Image, 
-    KeyboardAvoidingView,
     ScrollView,
-    Modal, 
-    ActivityIndicator,
     Alert 
 } from 'react-native'
 import AsyncStorage from '@react-native-community/async-storage'
@@ -35,35 +31,43 @@ export default class LoginComponent extends Component{
         this.setState({'hidePassword': true})
     }
 
+    validateEmail(email) {
+        return /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i.test(email)
+    }
+
     async loginUser(){
         if(this.state.email !== '' && this.state.password !== ''){
-            this.setState({"modalVisibility": true})
-            let url = `${BACKEND_SERVER}/login`;
-            let response = await fetch(url, {
-                method: 'POST',
-                body: JSON.stringify({
-                    "email": this.state.email,
-                    "password": this.state.password
-                }),
-                headers:{
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(res => res.json())
-            .catch(error => console.error('Error:', error))
-            .then(response => response);
-            if(response.error){
-                this.setState({"modalVisibility": false})
-                this.showAlert(response.error, response.errorDescription)
-            }else{
-                try {
-                    await AsyncStorage.setItem('userData', JSON.stringify(response.userData))
+            if(this.validateEmail(this.state.email)){
+                this.setState({"modalVisibility": true})
+                let url = `${BACKEND_SERVER}/login`;
+                let response = await fetch(url, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        "email": this.state.email,
+                        "password": this.state.password
+                    }),
+                    headers:{
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(res => res.json())
+                .catch(error => console.error('Error:', error))
+                .then(response => response);
+                if(response.error){
                     this.setState({"modalVisibility": false})
-                    this.props.navigation.reset({index: 0, routes: [{ name: 'home' }]})
-                } catch (error) {
-                    this.showAlert('Algo salió mal', error)
-                    this.props.navigation.reset({index: 0, routes: [{ name: 'Login' }]})
+                    this.showAlert(response.error, response.errorDescription)
+                }else{
+                    try {
+                        await AsyncStorage.setItem('userData', JSON.stringify(response.userData))
+                        this.setState({"modalVisibility": false})
+                        this.props.navigation.reset({index: 0, routes: [{ name: 'home' }]})
+                    } catch (error) {
+                        this.showAlert('Algo salió mal', error)
+                        this.props.navigation.reset({index: 0, routes: [{ name: 'Login' }]})
+                    }
                 }
+            } else{
+                this.showAlert('Algo salió mal', 'Ingresa un correo valido')
             }
         }else{
             this.showAlert('Algo salió mal', 'Falta tu correo y/o contraseña')

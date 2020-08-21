@@ -7,9 +7,7 @@ import {
     TouchableOpacity, 
     ScrollView,
     Image,
-    Alert,
-    Modal,
-    ActivityIndicator
+    Alert
 } from 'react-native'
 import AsyncStorage from '@react-native-community/async-storage';
 import ModalLoadComponent from '../modalLoad/ModalLoadComponent'
@@ -35,41 +33,49 @@ class RegistryComponent extends Component{
         );
     }
 
+    validateEmail(email) {
+        return /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i.test(email)
+    }
+
     async registry(){
         if(this.state.name !== '' && this.state.email !== '' && this.state.password !== '' && this.state.passwordConfirmation !== ''){
-            if(this.state.password !== this.state.passwordConfirmation){
-                this.showAlert('Algo salió mal', 'Las contraseñas deben coincidir ')
-            }else{
-                this.setState({"modalVisibility": true})
-                let url = `${BACKEND_SERVER}/registry`;
-                let response = await fetch(url, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        "fullname": this.state.name,
-                        "email": this.state.email,
-                        "password": this.state.password,
-                        "addres": 'Default'
-                    }),
-                    headers:{
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(res => res.json())
-                .catch(error => console.error('Error:', error))
-                .then(response => response);
-                if(response.error){
-                    this.setState({"modalVisibility": false})
-                    this.showAlert(response.error, response.errorDescription)
-                } else{
-                    try {
-                        await AsyncStorage.setItem('userData', JSON.stringify(response.userData))
-                        this.props.navigation.reset({index: 0,routes: [{ name: 'home' }],});
+            if(this.validateEmail(this.state.email)){
+                if(this.state.password !== this.state.passwordConfirmation){
+                    this.showAlert('Algo salió mal', 'Las contraseñas deben coincidir ')
+                }else{
+                    this.setState({"modalVisibility": true})
+                    let url = `${BACKEND_SERVER}/registry`;
+                    let response = await fetch(url, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            "fullname": this.state.name,
+                            "email": this.state.email,
+                            "password": this.state.password,
+                            "addres": 'Default'
+                        }),
+                        headers:{
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(res => res.json())
+                    .catch(error => console.error('Error:', error))
+                    .then(response => response);
+                    if(response.error){
                         this.setState({"modalVisibility": false})
-                        this.props.navigation.navigate("home")
-                    } catch (error) {
-                        console.log(error);
+                        this.showAlert(response.error, response.errorDescription)
+                    } else{
+                        try {
+                            await AsyncStorage.setItem('userData', JSON.stringify(response.userData))
+                            this.props.navigation.reset({index: 0,routes: [{ name: 'home' }],});
+                            this.setState({"modalVisibility": false})
+                            this.props.navigation.navigate("home")
+                        } catch (error) {
+                            console.log(error);
+                        }
                     }
                 }
+            }else{
+                this.showAlert('Algo salió mal', 'Ingresa un correo valido')
             }
         }
         else{
