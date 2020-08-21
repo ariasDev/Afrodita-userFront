@@ -12,6 +12,7 @@ import {
     ActivityIndicator
 } from 'react-native'
 import AsyncStorage from '@react-native-community/async-storage';
+import ModalLoadComponent from '../modalLoad/ModalLoadComponent'
 const BACKEND_SERVER = require('../../enviroment').BACKEND_SERVER
 
 class RegistryComponent extends Component{
@@ -135,23 +136,13 @@ class RegistryComponent extends Component{
                         <Text style={styles.textologin}>Ya tengo una cuenta</Text>
                     </TouchableOpacity>
                 </View>
-                <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={this.state.modalVisibility}
-                    >
-                    <View style={styles.centeredView}>
-                        <View style={styles.modalView}>
-                        <Text style={styles.modalText}>Cargando</Text>
-                        <ActivityIndicator size="large" color="#D500F9" />
-                        </View>
-                    </View>
-                </Modal>
+                <ModalLoadComponent
+                    modalVisibility={this.state.modalVisibility}
+                />
             </ScrollView>
         )
     }
 }
-
 
 const styles = StyleSheet.create({
     container: {
@@ -213,38 +204,7 @@ const styles = StyleSheet.create({
         textAlign: "center",
         fontSize: 17,
         fontWeight: "bold",
-    },
-    centeredView: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        marginTop: 22
-      },
-    modalView: {
-        margin: 20,
-        backgroundColor: "white",
-        borderRadius: 20,
-        padding: 35,
-        alignItems: "center",
-        shadowColor: "#000",
-        shadowOffset: {
-          width: 0,
-          height: 2
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5
-      },
-      textStyle: {
-        color: "white",
-        fontWeight: "bold",
-        textAlign: "center"
-      },
-      modalText: {
-        marginBottom: 15,
-        textAlign: "center"
-      }
+    }
 })
-
 
 export default RegistryComponent
