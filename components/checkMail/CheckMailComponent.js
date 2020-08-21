@@ -23,7 +23,7 @@ class CheckMailComponent extends Component{
             title,
             description,
             [
-                { text: "OK", onPress: () => console.log("OK Pressed") }
+                { text: "OK", onPress: () => "OK Pressed"}
             ],
             { cancelable: false }
         );

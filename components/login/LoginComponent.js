@@ -35,7 +35,6 @@ export default class LoginComponent extends Component{
 
     async loginUser(){
         if(this.state.email !== '' && this.state.password !== ''){
-            console.log( process.env.backendserver );
             this.setState({"modalVisibility": true})
             let url = `${BACKEND_SERVER}/login`;
             let response = await fetch(url, {
@@ -60,7 +59,8 @@ export default class LoginComponent extends Component{
                     this.setState({"modalVisibility": false})
                     this.props.navigation.reset({index: 0, routes: [{ name: 'home' }]})
                 } catch (error) {
-                    console.log(error);
+                    this.showAlert('Algo salió mal', error)
+                    this.props.navigation.reset({index: 0, routes: [{ name: 'Login' }]})
                 }
             }
         }else{
@@ -78,7 +78,7 @@ export default class LoginComponent extends Component{
             title,
             description,
             [
-                { text: "OK", onPress: () => console.log("OK Pressed") }
+                { text: "OK", onPress: () => "OK Pressed"}
             ],
             { cancelable: false }
         );
