@@ -16,8 +16,8 @@ class ChangePasswordComponent extends Component{
     state = {
         email: 'email',
         password: '',
-        VerificationCode: '',
         passwordConfirmation: '',
+        verificationCode: '',
         hidePassword: true,
         hidePasswordConfirmation: true,
         modalVisibility: false
@@ -59,7 +59,7 @@ class ChangePasswordComponent extends Component{
     }
 
     async changePassword(){
-        if(this.state.password !== '' && this.state.passwordConfirmation !== ''){
+        if(this.state.password !== '' && this.state.passwordConfirmation !== '' && this.state.verificationCode !== ''){
             if(this.state.password === this.state.passwordConfirmation){
                 this.setState({"modalVisibility": true})
                 let url = `${BACKEND_SERVER}/changePassword`;
@@ -67,7 +67,8 @@ class ChangePasswordComponent extends Component{
                     method: 'POST',
                     body: JSON.stringify({
                         "email": this.state.email,
-                        "password": this.state.password
+                        "password": this.state.password,
+                        "verificationCode": this.state.verificationCode
                     }),
                     headers:{
                         'Content-Type': 'application/json'
@@ -87,7 +88,7 @@ class ChangePasswordComponent extends Component{
                 this.showAlert('Algo salió mal', 'Las contraseñas no coinciden')
             }
         } else{
-            this.showAlert('Algo salió mal', 'Debes diligenciar los campos de contraseña')
+            this.showAlert('Algo salió mal', 'Debes diligenciar todos los campos')
         }
     }
 
@@ -115,6 +116,7 @@ class ChangePasswordComponent extends Component{
                     <Text style={styles.label}>Código de verificación</Text>
                     <TextInput
                         style={styles.input}
+                        onChangeText={text => this.setState({verificationCode: text})}
                         placeholder="Ingresa el código de verificación" 
                         placeholderTextColor="grey"
                         autoCapitalize="none"
