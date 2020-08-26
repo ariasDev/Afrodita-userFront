@@ -51,7 +51,11 @@ export default class LoginComponent extends Component{
                     }
                 })
                 .then(res => res.json())
-                .catch(error => console.error('Error:', error))
+                .catch(error => {
+                    return {
+                        "error": error
+                    }
+                })
                 .then(response => response);
                 if(response.error){
                     this.setState({"modalVisibility": false})

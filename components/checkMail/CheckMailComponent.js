@@ -52,7 +52,11 @@ class CheckMailComponent extends Component{
                         }
                     })
                     .then(res => res.json())
-                    .catch(error => error)
+                    .catch(error => {
+                        return{
+                            "error": error
+                        }
+                    })
                     .then(response => response);
                     if(response.error){
                         this.setState({"modalVisibility": false})
@@ -67,7 +71,7 @@ class CheckMailComponent extends Component{
             }
             
         } catch (error) {
-            this.showAlert('Algo salió mal', 'E stamos trabajando en ello')
+            this.showAlert('Algo salió mal', 'Estamos trabajando en ello')
         }
     }
 

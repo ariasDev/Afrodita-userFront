@@ -59,36 +59,45 @@ class ChangePasswordComponent extends Component{
     }
 
     async changePassword(){
-        if(this.state.password !== '' && this.state.passwordConfirmation !== '' && this.state.verificationCode !== ''){
-            if(this.state.password === this.state.passwordConfirmation){
-                this.setState({"modalVisibility": true})
-                let url = `${BACKEND_SERVER}/changePassword`;
-                let response = await fetch(url, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        "email": this.state.email,
-                        "password": this.state.password,
-                        "verificationCode": this.state.verificationCode
-                    }),
-                    headers:{
-                        'Content-Type': 'application/json'
+        try {
+            if(this.state.password !== '' && this.state.passwordConfirmation !== '' && this.state.verificationCode !== ''){
+                if(this.state.password === this.state.passwordConfirmation){
+                    this.setState({"modalVisibility": true})
+                    let url = `${BACKEND_SERVER}/changePassword`;
+                    let response = await fetch(url, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            "email": this.state.email,
+                            "password": this.state.password,
+                            "verificationCode": this.state.verificationCode
+                        }),
+                        headers:{
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(res => res.json())
+                    .catch(error => {
+                        return {
+                            "error": error
+                        }
+                    })
+                    .then(response => response);
+                    if(response.error){
+                        this.setState({"modalVisibility": false})
+                        this.showAlert('Algo salió mal', response.errorDescription)
+                    } else{
+                        this.setState({"modalVisibility": false})
+                        this.changeConfirmationAlert()
                     }
-                })
-                .then(res => res.json())
-                .catch(error => console.error('Error:', error))
-                .then(response => response);
-                if(response.error){
-                    this.setState({"modalVisibility": false})
-                    this.showAlert('Algo salió mal', response.errorDescription)
-                } else{
-                    this.setState({"modalVisibility": false})
-                    this.changeConfirmationAlert()
+                } else {
+                    this.showAlert('Algo salió mal', 'Las contraseñas no coinciden')
                 }
-            } else {
-                this.showAlert('Algo salió mal', 'Las contraseñas no coinciden')
+            } else{
+                this.showAlert('Algo salió mal', 'Debes diligenciar todos los campos')
             }
-        } else{
-            this.showAlert('Algo salió mal', 'Debes diligenciar todos los campos')
+            
+        } catch (error) {
+            this.showAlert('Algo salió mal', 'Estamos trabajando en ello')
         }
     }
 
