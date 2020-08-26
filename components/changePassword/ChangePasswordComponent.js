@@ -16,6 +16,7 @@ class ChangePasswordComponent extends Component{
     state = {
         email: 'email',
         password: '',
+        VerificationCode: '',
         passwordConfirmation: '',
         hidePassword: true,
         hidePasswordConfirmation: true,
@@ -24,6 +25,7 @@ class ChangePasswordComponent extends Component{
 
     componentDidMount(){
         this.setState({'email': this.props.route.params.email})
+        this.showAlert('Exito', 'Se envio un código de verificacion a tu correo')
     }
 
     showAlert(title, description){
@@ -110,12 +112,21 @@ class ChangePasswordComponent extends Component{
                         visible={false}
                         editable={false}
                     />
-                    <Text style={styles.label}>Contraseña</Text>
+                    <Text style={styles.label}>Código de verificación</Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Ingresa el código de verificación" 
+                        placeholderTextColor="grey"
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        visible={false}
+                    />
+                    <Text style={styles.label}>Nueva contraseña</Text>
                     <View style = { styles.textBoxBtnHolder }>
                         <TextInput  
                             secureTextEntry = { this.state.hidePassword } 
                             style = { styles.textBox }
-                            placeholder="Ingresa tu contraseña" 
+                            placeholder="Ingresa tu nueva contraseña" 
                             placeholderTextColor = "grey"
                             onChangeText={text => this.setState({password:text})}
                         />
@@ -128,7 +139,7 @@ class ChangePasswordComponent extends Component{
                         <TextInput  
                             secureTextEntry = { this.state.hidePasswordConfirmation } 
                             style = { styles.textBox }
-                            placeholder="Comfirma tu contraseña" 
+                            placeholder="Comfirma tu nueva contraseña" 
                             placeholderTextColor = "grey"
                             onChangeText={text => this.setState({passwordConfirmation:text})}
                         />

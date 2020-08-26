@@ -1,5 +1,5 @@
 const ENVIROMENTS = {
-    BACKEND_SERVER: 'https://dbece513cd4f.ngrok.io'
+    BACKEND_SERVER: 'https://df7adf7e28e0.ngrok.io'
 }
 
 module.exports = ENVIROMENTS
