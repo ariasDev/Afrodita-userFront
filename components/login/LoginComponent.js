@@ -36,47 +36,51 @@ export default class LoginComponent extends Component{
     }
 
     async loginUser(){
-        if(this.state.email !== '' && this.state.password !== ''){
-            if(this.validateEmail(this.state.email)){
-                this.setState({"modalVisibility": true})
-                let url = `${BACKEND_SERVER}/login`;
-                let response = await fetch(url, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        "email": this.state.email,
-                        "password": this.state.password
-                    }),
-                    headers:{
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(res => res.json())
-                .catch(error => {
-                    return {
-                        "error": error
-                    }
-                })
-                .then(response => response);
-                if(response.error){
-                    this.setState({"modalVisibility": false})
-                    this.showAlert(response.error, response.errorDescription)
-                }else{
-                    try {
-                        await AsyncStorage.setItem('userData', JSON.stringify(response.userData))
+        try {
+            if(this.state.email !== '' && this.state.password !== ''){
+                if(this.validateEmail(this.state.email)){
+                    this.setState({"modalVisibility": true})
+                    let url = `${BACKEND_SERVER}/login`;
+                    let response = await fetch(url, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            "email": this.state.email,
+                            "password": this.state.password
+                        }),
+                        headers:{
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(res => res.json())
+                    .catch(error => {
+                        return {
+                            "error": error
+                        }
+                    })
+                    .then(response => response);
+                    if(response.error){
                         this.setState({"modalVisibility": false})
-                        this.props.navigation.reset({index: 0, routes: [{ name: 'home' }]})
-                    } catch (error) {
-                        this.showAlert('Algo salió mal', error)
-                        this.props.navigation.reset({index: 0, routes: [{ name: 'Login' }]})
+                        this.showAlert('Algo salió mal', response.errorDescription || response.error.toString())
+                    }else{
+                        try {
+                            await AsyncStorage.setItem('userData', JSON.stringify(response.userData))
+                            this.setState({"modalVisibility": false})
+                            this.props.navigation.reset({index: 0, routes: [{ name: 'home' }]})
+                        } catch (error) {
+                            this.showAlert('Algo salió mal', error)
+                            this.props.navigation.reset({index: 0, routes: [{ name: 'Login' }]})
+                        }
                     }
+                } else{
+                    this.showAlert('Algo salió mal', 'Ingresa un correo valido')
                 }
-            } else{
-                this.showAlert('Algo salió mal', 'Ingresa un correo valido')
+            }else{
+                this.showAlert('Algo salió mal', 'Falta tu correo y/o contraseña')
             }
-        }else{
-            this.showAlert('Algo salió mal', 'Falta tu correo y/o contraseña')
+            
+        } catch (error) {
+            this.showAlert('Algo salió mal', 'Estamos trabajando en ello')
         }
-
     }
 
     managePasswordVisibility = () =>{
@@ -159,7 +163,7 @@ const styles = StyleSheet.create({
         flex: 2,
         justifyContent: "center",
         alignItems: "center",
-        paddingTop: 30
+        paddingTop: 15
         
     },
     logo: {
@@ -168,7 +172,8 @@ const styles = StyleSheet.create({
     },
     formContainer: {
         flex: 8,
-        justifyContent: "center"
+        justifyContent: "center",
+        paddingTop: 20
     },
     label: 
     {

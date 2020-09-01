@@ -17,7 +17,6 @@ class ChangePasswordComponent extends Component{
         email: 'email',
         password: '',
         passwordConfirmation: '',
-        verificationCode: '',
         hidePassword: true,
         hidePasswordConfirmation: true,
         modalVisibility: false
@@ -25,7 +24,6 @@ class ChangePasswordComponent extends Component{
 
     componentDidMount(){
         this.setState({'email': this.props.route.params.email})
-        this.showAlert('Exito', 'Se envio un código de verificacion a tu correo')
     }
 
     showAlert(title, description){
@@ -41,7 +39,7 @@ class ChangePasswordComponent extends Component{
 
     changeConfirmationAlert(){
         Alert.alert(
-            "Exito",
+            "Éxito",
             "La contraseña fue cambiada, ya puedes iniciar sesión",
             [
                 { text: "OK", onPress: () => this.props.navigation.reset({index: 0, routes: [{ name: 'Login' }]}) }
@@ -60,7 +58,7 @@ class ChangePasswordComponent extends Component{
 
     async changePassword(){
         try {
-            if(this.state.password !== '' && this.state.passwordConfirmation !== '' && this.state.verificationCode !== ''){
+            if(this.state.password !== '' && this.state.passwordConfirmation !== ''){
                 if(this.state.password === this.state.passwordConfirmation){
                     this.setState({"modalVisibility": true})
                     let url = `${BACKEND_SERVER}/changePassword`;
@@ -68,8 +66,7 @@ class ChangePasswordComponent extends Component{
                         method: 'POST',
                         body: JSON.stringify({
                             "email": this.state.email,
-                            "password": this.state.password,
-                            "verificationCode": this.state.verificationCode
+                            "password": this.state.password
                         }),
                         headers:{
                             'Content-Type': 'application/json'
@@ -84,19 +81,22 @@ class ChangePasswordComponent extends Component{
                     .then(response => response);
                     if(response.error){
                         this.setState({"modalVisibility": false})
-                        this.showAlert('Algo salió mal', response.errorDescription)
+                        this.showAlert('Algo salió mal', response.errorDescription || response.error.toString())
                     } else{
                         this.setState({"modalVisibility": false})
                         this.changeConfirmationAlert()
                     }
                 } else {
+                    this.setState({"modalVisibility": false})
                     this.showAlert('Algo salió mal', 'Las contraseñas no coinciden')
                 }
             } else{
+                this.setState({"modalVisibility": false})
                 this.showAlert('Algo salió mal', 'Debes diligenciar todos los campos')
             }
             
         } catch (error) {
+            this.setState({"modalVisibility": false})
             this.showAlert('Algo salió mal', 'Estamos trabajando en ello')
         }
     }
@@ -121,16 +121,6 @@ class ChangePasswordComponent extends Component{
                         autoCorrect={false}
                         visible={false}
                         editable={false}
-                    />
-                    <Text style={styles.label}>Código de verificación</Text>
-                    <TextInput
-                        style={styles.input}
-                        onChangeText={text => this.setState({verificationCode: text})}
-                        placeholder="Ingresa el código de verificación" 
-                        placeholderTextColor="grey"
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        visible={false}
                     />
                     <Text style={styles.label}>Nueva contraseña</Text>
                     <View style = { styles.textBoxBtnHolder }>
@@ -182,8 +172,7 @@ const styles = StyleSheet.create({
         flex: 2,
         justifyContent: "center",
         alignItems: "center",
-        paddingTop: 30
-        
+        paddingTop: 15
     },
     logo: {
         height: 80,
@@ -191,7 +180,8 @@ const styles = StyleSheet.create({
     },
     formContainer: {
         flex: 8,
-        justifyContent: "center"
+        justifyContent: "center",
+        paddingTop: 20
     },
     input: { 
         color: 'gray',

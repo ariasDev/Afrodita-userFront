@@ -38,48 +38,56 @@ class RegistryComponent extends Component{
     }
 
     async registry(){
-        if(this.state.name !== '' && this.state.email !== '' && this.state.password !== '' && this.state.passwordConfirmation !== ''){
-            if(this.validateEmail(this.state.email)){
-                if(this.state.password !== this.state.passwordConfirmation){
-                    this.showAlert('Algo salió mal', 'Las contraseñas deben coincidir ')
-                }else{
-                    this.setState({"modalVisibility": true})
-                    let url = `${BACKEND_SERVER}/registry`;
-                    let response = await fetch(url, {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            "fullname": this.state.name,
-                            "email": this.state.email,
-                            "password": this.state.password,
-                            "addres": 'Default'
-                        }),
-                        headers:{
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(res => res.json())
-                    .catch(error => console.error('Error:', error))
-                    .then(response => response);
-                    if(response.error){
-                        this.setState({"modalVisibility": false})
-                        this.showAlert(response.error, response.errorDescription)
-                    } else{
-                        try {
-                            await AsyncStorage.setItem('userData', JSON.stringify(response.userData))
-                            this.props.navigation.reset({index: 0,routes: [{ name: 'home' }],});
+        try {
+            if(this.state.name !== '' && this.state.email !== '' && this.state.password !== '' && this.state.passwordConfirmation !== ''){
+                if(this.validateEmail(this.state.email)){
+                    if(this.state.password !== this.state.passwordConfirmation){
+                        this.showAlert('Algo salió mal', 'Las contraseñas deben coincidir ')
+                    }else{
+                        this.setState({"modalVisibility": true})
+                        let url = `${BACKEND_SERVER}/registry`;
+                        let response = await fetch(url, {
+                            method: 'POST',
+                            body: JSON.stringify({
+                                "fullname": this.state.name,
+                                "email": this.state.email,
+                                "password": this.state.password,
+                                "addres": 'Default'
+                            }),
+                            headers:{
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(res => res.json())
+                        .catch(error => {
+                            return {
+                                "error": error
+                            }
+                        })
+                        .then(response => response);
+                        if(response.error){
                             this.setState({"modalVisibility": false})
-                            this.props.navigation.navigate("home")
-                        } catch (error) {
-                            console.log(error);
+                            this.showAlert('Algo salió mal', response.errorDescription || response.error.toString())
+                        } else{
+                            try {
+                                await AsyncStorage.setItem('userData', JSON.stringify(response.userData))
+                                this.props.navigation.reset({index: 0,routes: [{ name: 'home' }],});
+                                this.setState({"modalVisibility": false})
+                                this.props.navigation.navigate("home")
+                            } catch (error) {
+                                this.showAlert('Algo salió mal', 'Estamos trabajando en ello')
+                            }
                         }
                     }
+                }else{
+                    this.showAlert('Algo salió mal', 'Ingresa un correo valido')
                 }
-            }else{
-                this.showAlert('Algo salió mal', 'Ingresa un correo valido')
             }
-        }
-        else{
-            this.showAlert('Algo salió mal', 'Debes diligenciar todos los campos')
+            else{
+                this.showAlert('Algo salió mal', 'Debes diligenciar todos los campos')
+            }
+        } catch (error) {
+            this.showAlert('Algo salió mal', 'Estamos trabajando en ello')
         }
     }
 
@@ -162,7 +170,7 @@ const styles = StyleSheet.create({
         flex: 2,
         justifyContent: "center",
         alignItems: "center",
-        paddingTop: 30
+        paddingTop: 15
         
     },
     logo: {
@@ -171,7 +179,8 @@ const styles = StyleSheet.create({
     },
     formContainer: {
         flex: 8,
-        justifyContent: "center"
+        justifyContent: "center",
+        paddingTop: 20
     },
     label: 
     {

@@ -1,9 +1,10 @@
 import React, {Component} from 'react'
 import {
-    View, 
-    Text, 
-    StyleSheet, 
+    StyleSheet,
+    ScrollView,
+    View,
     Image,
+    Text,
     TextInput,
     TouchableOpacity,
     Alert
@@ -11,10 +12,16 @@ import {
 import ModalLoadComponent from '../modalLoad/ModalLoadComponent'
 const BACKEND_SERVER = require('../../enviroment').BACKEND_SERVER
 
-class CheckMailComponent extends Component{
+class CheckVerificationCodeComponent extends Component{
     state = {
         email: '',
-        modalVisibility: false
+        verificationCode: '',
+        modalVisibility: false,
+    }
+
+    componentDidMount(){
+        this.setState({'email': this.props.route.params.email})
+        this.showAlert('Éxito', `Se envió un código de verificacion a tu correo`)
     }
 
     showAlert(title, description){
@@ -22,30 +29,27 @@ class CheckMailComponent extends Component{
             title,
             description,
             [
-                { text: "OK", onPress: () => "OK Pressed"}
+                { text: "OK", onPress: () => "OK Pressed" }
             ],
             { cancelable: false }
         );
     }
 
-    // returns true if the email is valid
     validateEmail(email) {
         return /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i.test(email)
     }
 
-    async checkMail(){
+    async checkVerificationCode () {
         try {
-            if(this.state.email === ''){
-                this.showAlert('Algo salió mal', 'Ingresa tu correo')
-            }
-            else{
+            if(this.state.email !=='' && this.state.verificationCode !==''){
                 if(this.validateEmail(this.state.email)){
                     this.setState({"modalVisibility": true})
-                    let url = `${BACKEND_SERVER}/checkEmail`;
+                    let url = `${BACKEND_SERVER}/checkValidationCode`;
                     let response = await fetch(url, {
                         method: 'POST',
                         body: JSON.stringify({
                             "email": this.state.email,
+                            "verificationCode": this.state.verificationCode
                         }),
                         headers:{
                             'Content-Type': 'application/json'
@@ -61,51 +65,55 @@ class CheckMailComponent extends Component{
                     if(response.error){
                         this.setState({"modalVisibility": false})
                         this.showAlert('Algo salió mal', response.errorDescription || response.error.toString())
-                    } else{
-                        this.setState({"modalVisibility": false})
-                        this.props.navigation.navigate("Verificar código", {"email": this.state.email})
                     }
-                }else {
+                    else{
+                        this.setState({"modalVisibility": false})
+                        this.props.navigation.navigate("Cambiar contraseña", {"email": this.state.email})
+                    }
+                } else{
+                    this.setState({"modalVisibility": false})
                     this.showAlert('Algo salió mal', 'Ingresa un correo valido')
                 }
+            }else {
+                this.setState({"modalVisibility": false})
+                this.showAlert('Algo salió mal', 'Debes diligenciar todos los campos')
             }
             
         } catch (error) {
+            console.log(error);
+            this.setState({"modalVisibility": false})
             this.showAlert('Algo salió mal', 'Estamos trabajando en ello')
         }
     }
 
     render(){
         return(
-            <View style = {styles.container}>
-                 <View style = {styles.logoContainer}>
+            <ScrollView style = {styles.container}>
+                <View style = {styles.logoContainer}>
                     <Image 
                         source ={require('../../assets/logo1.png') }
                         style = {styles.logo}
                      />
                 </View>
                 <View style = {styles.formContainer}>
-                    <Text style={styles.label}>Correo</Text>
+                    <Text style={styles.label}>Código de verificación</Text>
                     <TextInput
                         style={styles.input}
-                        onChangeText={text => this.setState({email:text})}
-                        placeholder="Verifica tu correo para cambiar la contraseña" 
+                        onChangeText={text => this.setState({verificationCode: text})}
+                        placeholder="Ingresa el código de verificación" 
                         placeholderTextColor="grey"
                         autoCapitalize="none"
                         autoCorrect={false}
                         visible={false}
                     />
-                    <TouchableOpacity style={styles.botonVerificar} onPress = {() => this.checkMail()} >
-                        <Text style={styles.textoVerificar}>Verificar correo</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.registrarme} onPress = {() => this.props.navigation.navigate("Registro")}>
-                        <Text style={styles.textoRegistrarme}>Registrarme</Text>
-                    </TouchableOpacity>
                 </View>
+                <TouchableOpacity style={styles.buttonConfirm} onPress = {() => this.checkVerificationCode()} >
+                        <Text style={styles.textConfirm}>Verificar código</Text>
+                </TouchableOpacity>
                 <ModalLoadComponent
                     modalVisibility={this.state.modalVisibility}
                 />
-            </View>
+            </ScrollView>
         )
     }
 }
@@ -131,6 +139,7 @@ const styles = StyleSheet.create({
     },
     formContainer: {
         flex: 8,
+        justifyContent: "center",
         paddingTop: 20
     },
     label: 
@@ -138,6 +147,7 @@ const styles = StyleSheet.create({
         fontWeight: "bold"
     },
     input: { 
+        color: 'gray',
         height: 40, 
         borderColor: 'gray', 
         borderWidth: 1,
@@ -145,32 +155,19 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         borderRadius: 5,
         borderWidth: 0.7,
-    }, 
-    botonVerificar:{
+    },
+    buttonConfirm:{
         justifyContent: "center",
         backgroundColor: "#D500F9",
         height: 40,
         borderRadius: 5
     },
-    textoVerificar: {
+    textConfirm: {
         color: "white",
         textAlign: "center",
         fontSize: 20,
         fontWeight: "bold",
-    },
-    registrarme: {
-        height: 40,
-        marginTop: 20,
-        borderRadius: 5,
-        borderColor: 'black', 
-        borderWidth: 1.8,
-        justifyContent: "center"
-    },
-    textoRegistrarme:{
-        textAlign: "center",
-        fontSize: 17,
-        fontWeight: "bold",
     }
 })
 
-export default CheckMailComponent
+export default CheckVerificationCodeComponent

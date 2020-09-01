@@ -9,8 +9,8 @@ import LoginComponent from './components/login/LoginComponent'
 import RegistryComponent from './components/registro/RegistryComponent'
 import HomeComponent from './components/home/HomeComponent'
 import CheckMailComponent from './components/checkMail/CheckMailComponent'
+import CheckVerificactionCodeComponent from './components/checkVerificationCode/CheckVerificactionCodeComponent'
 import ChangePasswordComponent from './components/changePassword/ChangePasswordComponent'
-
 
 const Stack = createStackNavigator();
 
@@ -38,6 +38,10 @@ const App = () => {
         <Stack.Screen 
           name="Verificar correo" 
           component={CheckMailComponent} 
+        />
+        <Stack.Screen 
+          name="Verificar código" 
+          component={CheckVerificactionCodeComponent} 
         />
         <Stack.Screen 
           name="Cambiar contraseña" 
