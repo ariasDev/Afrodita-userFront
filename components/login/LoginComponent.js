@@ -11,8 +11,8 @@ import {
 } from 'react-native'
 import AsyncStorage from '@react-native-community/async-storage'
 import ModalLoadComponent from '../modalLoad/ModalLoadComponent'
-
 const BACKEND_SERVER = require('../../enviroment').BACKEND_SERVER
+const validationsModule = require('../../utilities/ validationsModule')
 
 export default class LoginComponent extends Component{
     state = {
@@ -31,20 +31,11 @@ export default class LoginComponent extends Component{
         this.setState({'hidePassword': true})
     }
 
-    validateEmail(email) {
-        return /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i.test(email)
-    }
-
-
-    validatePasswordLength(password){
-        return password.length >= 8 ? true : false
-    }
-
     async loginUser(){
         try {
             if(this.state.email !== '' && this.state.password !== ''){
-                if(this.validateEmail(this.state.email)){
-                    if(this.validatePasswordLength(this.state.password)){
+                if(validationsModule.validateEmail(this.state.email)){
+                    if(validationsModule.validatePasswordLength(this.state.password)){
                         this.setState({"modalVisibility": true})
                         let url = `${BACKEND_SERVER}/login`;
                         let response = await fetch(url, {

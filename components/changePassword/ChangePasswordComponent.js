@@ -11,6 +11,7 @@ import {
 } from 'react-native'
 import ModalLoadComponent from '../modalLoad/ModalLoadComponent'
 const BACKEND_SERVER = require('../../enviroment').BACKEND_SERVER
+const validationsModule = require('../../utilities/ validationsModule')
 
 class ChangePasswordComponent extends Component{
     state = {
@@ -56,15 +57,11 @@ class ChangePasswordComponent extends Component{
         this.setState({ hidePasswordConfirmation: !this.state.hidePasswordConfirmation });
     }
 
-    validatePasswordLength(password){
-        return password.length >= 8 ? true : false
-    }
-
     async changePassword(){
         try {
             if(this.state.password !== '' && this.state.passwordConfirmation !== ''){
                 if(this.state.password === this.state.passwordConfirmation){
-                    if(this.validatePasswordLength(this.state.password)){
+                    if(validationsModule.validatePasswordLength(this.state.password)){
                         this.setState({"modalVisibility": true})
                         let url = `${BACKEND_SERVER}/changePassword`;
                         let response = await fetch(url, {

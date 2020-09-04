@@ -10,6 +10,7 @@ import {
 } from 'react-native'
 import ModalLoadComponent from '../modalLoad/ModalLoadComponent'
 const BACKEND_SERVER = require('../../enviroment').BACKEND_SERVER
+const validationsModule = require('../../utilities/ validationsModule')
 
 class CheckMailComponent extends Component{
     state = {
@@ -28,18 +29,13 @@ class CheckMailComponent extends Component{
         );
     }
 
-    // returns true if the email is valid
-    validateEmail(email) {
-        return /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i.test(email)
-    }
-
     async checkMail(){
         try {
             if(this.state.email === ''){
                 this.showAlert('Algo salió mal', 'Ingresa tu correo')
             }
             else{
-                if(this.validateEmail(this.state.email)){
+                if(validationsModule.validateEmail(this.state.email)){
                     this.setState({"modalVisibility": true})
                     let url = `${BACKEND_SERVER}/checkEmail`;
                     let response = await fetch(url, {

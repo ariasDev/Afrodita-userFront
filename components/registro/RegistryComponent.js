@@ -12,6 +12,7 @@ import {
 import AsyncStorage from '@react-native-community/async-storage';
 import ModalLoadComponent from '../modalLoad/ModalLoadComponent'
 const BACKEND_SERVER = require('../../enviroment').BACKEND_SERVER
+const validationsModule = require('../../utilities/ validationsModule')
 
 class RegistryComponent extends Component{
     state = {
@@ -33,20 +34,12 @@ class RegistryComponent extends Component{
         );
     }
 
-    validateEmail(email) {
-        return /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i.test(email)
-    }
-
-    validatePasswordLength(password){
-        return password.length >= 8 ? true : false
-    }
-
     async registry(){
         try {
             if(this.state.name !== '' && this.state.email !== '' && this.state.password !== '' && this.state.passwordConfirmation !== ''){
-                if(this.validateEmail(this.state.email)){
+                if(validationsModule.validateEmail(this.state.email)){
                     if(this.state.password === this.state.passwordConfirmation){
-                        if(this.validatePasswordLength(this.state.password)){
+                        if(validationsModule.validatePasswordLength(this.state.password)){
                             this.setState({"modalVisibility": true})
                             let url = `${BACKEND_SERVER}/registry`;
                             let response = await fetch(url, {

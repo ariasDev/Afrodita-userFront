@@ -11,6 +11,7 @@ import {
 } from 'react-native'
 import ModalLoadComponent from '../modalLoad/ModalLoadComponent'
 const BACKEND_SERVER = require('../../enviroment').BACKEND_SERVER
+const validationsModule = require('../../utilities/ validationsModule')
 
 class CheckVerificationCodeComponent extends Component{
     state = {
@@ -34,15 +35,11 @@ class CheckVerificationCodeComponent extends Component{
             { cancelable: false }
         );
     }
-
-    validateEmail(email) {
-        return /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i.test(email)
-    }
-
+    
     async checkVerificationCode () {
         try {
             if(this.state.email !=='' && this.state.verificationCode !==''){
-                if(this.validateEmail(this.state.email)){
+                if(validationsModule.validateEmail(this.state.email)){
                     this.setState({"modalVisibility": true})
                     let url = `${BACKEND_SERVER}/checkValidationCode`;
                     let response = await fetch(url, {
