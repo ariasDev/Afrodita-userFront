@@ -37,47 +37,55 @@ class RegistryComponent extends Component{
         return /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i.test(email)
     }
 
+    validatePasswordLength(password){
+        return password.length >= 8 ? true : false
+    }
+
     async registry(){
         try {
             if(this.state.name !== '' && this.state.email !== '' && this.state.password !== '' && this.state.passwordConfirmation !== ''){
                 if(this.validateEmail(this.state.email)){
-                    if(this.state.password !== this.state.passwordConfirmation){
-                        this.showAlert('Algo salió mal', 'Las contraseñas deben coincidir ')
-                    }else{
-                        this.setState({"modalVisibility": true})
-                        let url = `${BACKEND_SERVER}/registry`;
-                        let response = await fetch(url, {
-                            method: 'POST',
-                            body: JSON.stringify({
-                                "fullname": this.state.name,
-                                "email": this.state.email,
-                                "password": this.state.password,
-                                "addres": 'Default'
-                            }),
-                            headers:{
-                                'Content-Type': 'application/json'
-                            }
-                        })
-                        .then(res => res.json())
-                        .catch(error => {
-                            return {
-                                "error": error
-                            }
-                        })
-                        .then(response => response);
-                        if(response.error){
-                            this.setState({"modalVisibility": false})
-                            this.showAlert('Algo salió mal', response.errorDescription || response.error.toString())
-                        } else{
-                            try {
-                                await AsyncStorage.setItem('userData', JSON.stringify(response.userData))
-                                this.props.navigation.reset({index: 0,routes: [{ name: 'home' }],});
+                    if(this.state.password === this.state.passwordConfirmation){
+                        if(this.validatePasswordLength(this.state.password)){
+                            this.setState({"modalVisibility": true})
+                            let url = `${BACKEND_SERVER}/registry`;
+                            let response = await fetch(url, {
+                                method: 'POST',
+                                body: JSON.stringify({
+                                    "fullname": this.state.name,
+                                    "email": this.state.email,
+                                    "password": this.state.password,
+                                    "addres": 'Default'
+                                }),
+                                headers:{
+                                    'Content-Type': 'application/json'
+                                }
+                            })
+                            .then(res => res.json())
+                            .catch(error => {
+                                return {
+                                    "error": error
+                                }
+                            })
+                            .then(response => response);
+                            if(response.error){
                                 this.setState({"modalVisibility": false})
-                                this.props.navigation.navigate("home")
-                            } catch (error) {
-                                this.showAlert('Algo salió mal', 'Estamos trabajando en ello')
+                                this.showAlert('Algo salió mal', response.errorDescription || response.error.toString())
+                            } else{
+                                try {
+                                    await AsyncStorage.setItem('userData', JSON.stringify(response.userData))
+                                    this.props.navigation.reset({index: 0,routes: [{ name: 'home' }],});
+                                    this.setState({"modalVisibility": false})
+                                    this.props.navigation.navigate("home")
+                                } catch (error) {
+                                    this.showAlert('Algo salió mal', 'Estamos trabajando en ello')
+                                }
                             }
+                        } else{
+                            this.showAlert('Algo salió mal', 'La contraseña debe ser minimo de 8 caracteres')
                         }
+                    }else{
+                        this.showAlert('Algo salió mal', 'Las contraseñas deben coincidir ')
                     }
                 }else{
                     this.showAlert('Algo salió mal', 'Ingresa un correo valido')

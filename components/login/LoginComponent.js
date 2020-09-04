@@ -35,42 +35,52 @@ export default class LoginComponent extends Component{
         return /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i.test(email)
     }
 
+
+    validatePasswordLength(password){
+        return password.length >= 8 ? true : false
+    }
+
     async loginUser(){
         try {
             if(this.state.email !== '' && this.state.password !== ''){
                 if(this.validateEmail(this.state.email)){
-                    this.setState({"modalVisibility": true})
-                    let url = `${BACKEND_SERVER}/login`;
-                    let response = await fetch(url, {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            "email": this.state.email,
-                            "password": this.state.password
-                        }),
-                        headers:{
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(res => res.json())
-                    .catch(error => {
-                        return {
-                            "error": error
-                        }
-                    })
-                    .then(response => response);
-                    if(response.error){
-                        this.setState({"modalVisibility": false})
-                        this.showAlert('Algo salió mal', response.errorDescription || response.error.toString())
-                    }else{
-                        try {
-                            await AsyncStorage.setItem('userData', JSON.stringify(response.userData))
+                    if(this.validatePasswordLength(this.state.password)){
+                        this.setState({"modalVisibility": true})
+                        let url = `${BACKEND_SERVER}/login`;
+                        let response = await fetch(url, {
+                            method: 'POST',
+                            body: JSON.stringify({
+                                "email": this.state.email,
+                                "password": this.state.password
+                            }),
+                            headers:{
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(res => res.json())
+                        .catch(error => {
+                            return {
+                                "error": error
+                            }
+                        })
+                        .then(response => response);
+                        if(response.error){
                             this.setState({"modalVisibility": false})
-                            this.props.navigation.reset({index: 0, routes: [{ name: 'home' }]})
-                        } catch (error) {
-                            this.showAlert('Algo salió mal', error)
-                            this.props.navigation.reset({index: 0, routes: [{ name: 'Login' }]})
+                            this.showAlert('Algo salió mal', response.errorDescription || response.error.toString())
+                        }else{
+                            try {
+                                await AsyncStorage.setItem('userData', JSON.stringify(response.userData))
+                                this.setState({"modalVisibility": false})
+                                this.props.navigation.reset({index: 0, routes: [{ name: 'home' }]})
+                            } catch (error) {
+                                this.showAlert('Algo salió mal', error)
+                                this.props.navigation.reset({index: 0, routes: [{ name: 'Login' }]})
+                            }
                         }
+                    } else{
+                        this.showAlert('Algo salió mal', 'La contraseña debe ser minimo de 8 caracteres')
                     }
+                    
                 } else{
                     this.showAlert('Algo salió mal', 'Ingresa un correo valido')
                 }
@@ -79,6 +89,7 @@ export default class LoginComponent extends Component{
             }
             
         } catch (error) {
+            console.log(error);
             this.showAlert('Algo salió mal', 'Estamos trabajando en ello')
         }
     }

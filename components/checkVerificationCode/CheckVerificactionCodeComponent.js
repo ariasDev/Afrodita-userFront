@@ -80,7 +80,6 @@ class CheckVerificationCodeComponent extends Component{
             }
             
         } catch (error) {
-            console.log(error);
             this.setState({"modalVisibility": false})
             this.showAlert('Algo salió mal', 'Estamos trabajando en ello')
         }

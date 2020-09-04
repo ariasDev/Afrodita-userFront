@@ -56,35 +56,43 @@ class ChangePasswordComponent extends Component{
         this.setState({ hidePasswordConfirmation: !this.state.hidePasswordConfirmation });
     }
 
+    validatePasswordLength(password){
+        return password.length >= 8 ? true : false
+    }
+
     async changePassword(){
         try {
             if(this.state.password !== '' && this.state.passwordConfirmation !== ''){
                 if(this.state.password === this.state.passwordConfirmation){
-                    this.setState({"modalVisibility": true})
-                    let url = `${BACKEND_SERVER}/changePassword`;
-                    let response = await fetch(url, {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            "email": this.state.email,
-                            "password": this.state.password
-                        }),
-                        headers:{
-                            'Content-Type': 'application/json'
+                    if(this.validatePasswordLength(this.state.password)){
+                        this.setState({"modalVisibility": true})
+                        let url = `${BACKEND_SERVER}/changePassword`;
+                        let response = await fetch(url, {
+                            method: 'POST',
+                            body: JSON.stringify({
+                                "email": this.state.email,
+                                "password": this.state.password
+                            }),
+                            headers:{
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(res => res.json())
+                        .catch(error => {
+                            return {
+                                "error": error
+                            }
+                        })
+                        .then(response => response);
+                        if(response.error){
+                            this.setState({"modalVisibility": false})
+                            this.showAlert('Algo salió mal', response.errorDescription || response.error.toString())
+                        } else{
+                            this.setState({"modalVisibility": false})
+                            this.changeConfirmationAlert()
                         }
-                    })
-                    .then(res => res.json())
-                    .catch(error => {
-                        return {
-                            "error": error
-                        }
-                    })
-                    .then(response => response);
-                    if(response.error){
-                        this.setState({"modalVisibility": false})
-                        this.showAlert('Algo salió mal', response.errorDescription || response.error.toString())
                     } else{
-                        this.setState({"modalVisibility": false})
-                        this.changeConfirmationAlert()
+                        this.showAlert('Algo salió mal', 'La contraseña debe ser minimo de 8 caracteres')
                     }
                 } else {
                     this.setState({"modalVisibility": false})
