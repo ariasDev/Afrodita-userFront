@@ -11,7 +11,7 @@ import {
 } from 'react-native'
 import ModalLoadComponent from '../modalLoad/ModalLoadComponent'
 const BACKEND_SERVER = require('../../enviroment').BACKEND_SERVER
-const validationsModule = require('../../utilities/ validationsModule')
+const validationsModule = require('../../utilities/validationsModule')
 
 class ChangePasswordComponent extends Component{
     state = {

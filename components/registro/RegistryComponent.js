@@ -12,7 +12,7 @@ import {
 import AsyncStorage from '@react-native-community/async-storage';
 import ModalLoadComponent from '../modalLoad/ModalLoadComponent'
 const BACKEND_SERVER = require('../../enviroment').BACKEND_SERVER
-const validationsModule = require('../../utilities/ validationsModule')
+const validationsModule = require('../../utilities/validationsModule')
 
 class RegistryComponent extends Component{
     state = {
